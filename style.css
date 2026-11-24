@@ -77,3 +77,117 @@ body {
 }
 
 /* 6.
+/* ===== 2단계: 사용자별 페이지 ===== */
+
+/* 상단 제목 영역 */
+.page-header {
+  max-width: 960px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 40px 20px 20px;
+}
+
+.back {
+  display: inline-block;
+  color: #666;
+  text-decoration: none;
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+}
+
+.back:hover {
+  color: #222;
+}
+
+.page-header h1 {
+  font-size: 1.8rem;
+  margin-bottom: 8px;
+}
+
+.page-header p {
+  color: #666;
+}
+
+/* 유튜버 카드 목록 */
+.channel-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  max-width: 960px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 20px;
+  flex: 1;
+  align-content: start;
+}
+
+/* 유튜버 카드 하나 */
+.channel {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* 프로필 동그라미 + 이름 */
+.channel-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #ff4d4d;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.channel h2 {
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+}
+
+.tag {
+  display: inline-block;
+  background: #f0f0f2;
+  color: #555;
+  font-size: 0.8rem;
+  padding: 2px 10px;
+  border-radius: 999px;
+}
+
+/* 구독자·조회수·참여율 */
+.stats {
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+  padding: 16px 0;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 16px;
+}
+
+.stats strong {
+  display: block;
+  font-size: 1.1rem;
+}
+
+.stats span {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.desc {
+  color: #666;
+  font-size: 0.9rem;
+}
