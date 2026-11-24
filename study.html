@@ -14,9 +14,19 @@
     <p>믿고 배울 수 있는 강의형 채널을 찾아보세요.</p>
   </header>
 
+  <section class="search-area">
+    <input type="text" id="search" class="search-input" placeholder="배우고 싶은 분야를 검색해 보세요 (예: 영어, 코딩)">
+    <div class="filters">
+      <button class="filter-btn active" data-filter="전체">전체</button>
+      <button class="filter-btn" data-filter="입문">입문</button>
+      <button class="filter-btn" data-filter="초중급">초중급</button>
+      <button class="filter-btn" data-filter="중급">중급</button>
+    </div>
+  </section>
+
   <main class="channel-list">
 
-    <article class="channel">
+    <article class="channel" data-filter="입문">
       <div class="channel-top">
         <div class="avatar">코</div>
         <div>
@@ -32,7 +42,7 @@
       <p class="desc">HTML·CSS부터 차근차근 알려주는 비전공자용 강의</p>
     </article>
 
-    <article class="channel">
+    <article class="channel" data-filter="초중급">
       <div class="channel-top">
         <div class="avatar">영</div>
         <div>
@@ -48,7 +58,7 @@
       <p class="desc">출퇴근길에 듣기 좋은 짧은 생활 영어 표현</p>
     </article>
 
-    <article class="channel">
+    <article class="channel" data-filter="중급">
       <div class="channel-top">
         <div class="avatar">마</div>
         <div>
@@ -64,11 +74,15 @@
       <p class="desc">퍼포먼스 마케팅 지표 분석과 실전 사례</p>
     </article>
 
+    <p id="empty" class="empty">찾는 채널이 없어요. 다른 검색어를 입력해 보세요.</p>
+
   </main>
 
   <footer>
     <p>© 2026 유튜브 파인더</p>
   </footer>
+
+  <script src="search.js"></script>
 
 </body>
 </html>
