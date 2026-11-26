@@ -3,41 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>공부할 유튜버 찾기 | 유튜브 파인더</title>
+  <title>볼 게 없을 때 | 유튜브 파인더</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <header class="page-header">
     <a href="index.html" class="back">← 처음으로</a>
-    <h1>📚 공부할 유튜버 찾기</h1>
-    <p>배우고 싶은 분야를 검색하면 유튜브에서 강의 채널을 찾아드려요.</p>
+    <h1>🍿 볼 게 없을 때</h1>
+    <p>지금 기분을 고르거나, 그냥 아무거나 추천받아 보세요.</p>
   </header>
 
   <section class="search-area">
     <form id="search-form" class="search-form">
-      <input type="text" id="search" class="search-input" placeholder="예: 엑셀, 영어 회화, 파이썬">
+      <input type="text" id="search" class="search-input" placeholder="보고 싶은 게 있으면 직접 검색해도 돼요">
       <button type="submit" class="search-btn">검색</button>
     </form>
 
-    <div class="toolbar">
-      <div class="filters">
-        <button class="filter-btn active" data-size="all">전체</button>
-        <button class="filter-btn" data-size="micro">1만 미만</button>
-        <button class="filter-btn" data-size="small">1만~10만</button>
-        <button class="filter-btn" data-size="mid">10만~100만</button>
-        <button class="filter-btn" data-size="big">100만 이상</button>
-      </div>
-      <select id="sort" class="sort-select">
-        <option value="relevance">관련도순</option>
-        <option value="subscribers">구독자 많은 순</option>
-        <option value="videos">강의 영상 많은 순</option>
-        <option value="avgViews">평균 조회수 높은 순</option>
-      </select>
+    <div class="filters">
+      <button class="filter-btn mood-btn" data-mood="laugh">😂 웃고 싶을 때</button>
+      <button class="filter-btn mood-btn" data-mood="healing">🌿 힐링하고 싶을 때</button>
+      <button class="filter-btn mood-btn" data-mood="focus">🔍 몰입하고 싶을 때</button>
+      <button class="filter-btn mood-btn" data-mood="learn">💡 뭔가 알고 싶을 때</button>
     </div>
 
-    <p id="count" class="result-count"></p>
-    <p id="status" class="status">검색어를 입력하고 Enter를 눌러보세요.</p>
+    <button id="random-btn" class="random-btn">🎲 아무거나 추천받기</button>
+
+    <p id="topic" class="topic"></p>
+    <p id="status" class="status">기분 버튼이나 🎲 버튼을 눌러보세요.</p>
   </section>
 
   <main id="channel-list" class="channel-list"></main>
@@ -47,7 +40,3 @@
   </footer>
 
   <script src="config.js"></script>
-  <script src="youtube.js"></script>
-
-</body>
-</html>
