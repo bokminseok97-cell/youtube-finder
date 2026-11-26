@@ -9,12 +9,14 @@ const randomButton = document.querySelector('#random-btn');
 const sizeButtons = document.querySelectorAll('.size-btn');
 const sortSelect = document.querySelector('#sort');
 
-// 기분별 추천 주제 (자유롭게 추가·수정해도 돼요)
+  // 기분별 추천 주제 (자유롭게 추가·수정해도 돼요)
 const MOODS = {
   laugh: ['웃긴 동물', '코미디 스케치', '몰래카메라', '웹드라마'],
   healing: ['캠핑 브이로그', '자연 ASMR', '시골 일상', '요리 브이로그'],
   focus: ['세계 미스터리', '다큐멘터리', '역사 이야기', '여행 다큐'],
-  learn: ['과학 실험', '우주 이야기', '경제 상식', '심리학 이야기']
+  learn: ['과학 실험', '우주 이야기', '경제 상식', '심리학 이야기'],
+  vlog: ['일상 브이로그', '직장인 브이로그', '자취 브이로그', '해외 생활 브이로그', '커플 브이로그'],
+  celeb: ['연예인 브이로그', '아이돌 자체 콘텐츠', '배우 유튜브', '개그맨 유튜브', '웹예능']
 };
 
 const SIZE_RANGES = {
