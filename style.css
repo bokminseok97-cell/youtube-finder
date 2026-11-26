@@ -376,3 +376,69 @@ a.channel:hover {
   background: #e63e3e;
   border-color: #e63e3e;
 }
+/* ===== 공통: 기분 줄 + 다른 채널 보기 ===== */
+.mood-row {
+  margin-top: 16px;
+}
+
+.row-label {
+  display: block;
+  font-size: 0.85rem;
+  color: #888;
+  margin-bottom: 8px;
+}
+
+.mood-row .filters {
+  margin-top: 0;
+}
+
+.random-chip {
+  background: #ff4d4d;
+  color: #fff;
+  border-color: #ff4d4d;
+  font-weight: bold;
+}
+
+.random-chip:hover {
+  background: #e63e3e;
+  border-color: #e63e3e;
+}
+
+.result-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.result-bar .result-count {
+  margin-top: 0;
+}
+
+.reroll-btn {
+  padding: 8px 16px;
+  border: 1px solid #ff4d4d;
+  border-radius: 999px;
+  background: #fff;
+  color: #ff4d4d;
+  font-size: 0.9rem;
+  font-weight: bold;
+  font-family: inherit;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.reroll-btn:hover {
+  background: #ff4d4d;
+  color: #fff;
+}
+
+.reroll-btn[hidden] {
+  display: none;
+}
+
+.reroll-bottom {
+  text-align: center;
+  padding: 8px 20px 24px;
+}

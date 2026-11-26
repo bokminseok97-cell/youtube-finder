@@ -11,7 +11,7 @@
   <header class="page-header">
     <a href="index.html" class="back">← 처음으로</a>
     <h1>📚 공부할 유튜버 찾기</h1>
-    <p>배우고 싶은 분야를 검색하면 유튜브에서 강의 채널을 찾아드려요.</p>
+    <p>배우고 싶은 분야를 검색하면 구독자 1만 명 이상 강의 채널을 찾아드려요.</p>
   </header>
 
   <section class="search-area">
@@ -22,11 +22,10 @@
 
     <div class="toolbar">
       <div class="filters">
-        <button class="filter-btn active" data-size="all">전체</button>
-        <button class="filter-btn" data-size="micro">1만 미만</button>
-        <button class="filter-btn" data-size="small">1만~10만</button>
-        <button class="filter-btn" data-size="mid">10만~100만</button>
-        <button class="filter-btn" data-size="big">100만 이상</button>
+        <button class="filter-btn size-btn active" data-size="all">전체 (1만 이상)</button>
+        <button class="filter-btn size-btn" data-size="small">1만~10만</button>
+        <button class="filter-btn size-btn" data-size="mid">10만~100만</button>
+        <button class="filter-btn size-btn" data-size="big">100만 이상</button>
       </div>
       <select id="sort" class="sort-select">
         <option value="relevance">관련도순</option>
@@ -36,18 +35,31 @@
       </select>
     </div>
 
-    <p id="count" class="result-count"></p>
+    <div class="result-bar">
+      <p id="count" class="result-count"></p>
+      <button class="reroll-btn" hidden>🔄 다른 채널 보기</button>
+    </div>
     <p id="status" class="status">검색어를 입력하고 Enter를 눌러보세요.</p>
   </section>
 
   <main id="channel-list" class="channel-list"></main>
 
+  <div class="reroll-bottom">
+    <button class="reroll-btn" hidden>🔄 다른 채널 보기</button>
+  </div>
+
   <footer>
     <p>© 2026 유튜브 파인더</p>
   </footer>
 
+  <script>
+    window.PAGE = {
+      suffix: ' 강의',
+      videoLabel: '강의 영상'
+    };
+  </script>
   <script src="config.js"></script>
-  <script src="youtube.js"></script>
+  <script src="finder.js"></script>
 
 </body>
 </html>
