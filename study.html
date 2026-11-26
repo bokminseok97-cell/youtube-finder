@@ -19,6 +19,24 @@
       <input type="text" id="search" class="search-input" placeholder="예: 엑셀, 영어 회화, 파이썬">
       <button type="submit" class="search-btn">검색</button>
     </form>
+
+    <div class="toolbar">
+      <div class="filters">
+        <button class="filter-btn active" data-size="all">전체</button>
+        <button class="filter-btn" data-size="micro">1만 미만</button>
+        <button class="filter-btn" data-size="small">1만~10만</button>
+        <button class="filter-btn" data-size="mid">10만~100만</button>
+        <button class="filter-btn" data-size="big">100만 이상</button>
+      </div>
+      <select id="sort" class="sort-select">
+        <option value="relevance">관련도순</option>
+        <option value="subscribers">구독자 많은 순</option>
+        <option value="videos">강의 영상 많은 순</option>
+        <option value="avgViews">평균 조회수 높은 순</option>
+      </select>
+    </div>
+
+    <p id="count" class="result-count"></p>
     <p id="status" class="status">검색어를 입력하고 Enter를 눌러보세요.</p>
   </section>
 

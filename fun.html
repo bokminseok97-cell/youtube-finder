@@ -3,72 +3,51 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>볼 게 없을 때 | 유튜브 파인더</title>
+  <title>공부할 유튜버 찾기 | 유튜브 파인더</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <header class="page-header">
     <a href="index.html" class="back">← 처음으로</a>
-    <h1>🍿 볼 게 없을 때</h1>
-    <p>아직 몰랐던 새로운 채널을 발견해 보아요</p>
+    <h1>📚 공부할 유튜버 찾기</h1>
+    <p>배우고 싶은 분야를 검색하면 유튜브에서 강의 채널을 찾아드려요.</p>
   </header>
 
-  <main class="channel-list">
+  <section class="search-area">
+    <form id="search-form" class="search-form">
+      <input type="text" id="search" class="search-input" placeholder="예: 엑셀, 영어 회화, 파이썬">
+      <button type="submit" class="search-btn">검색</button>
+    </form>
 
-    <article class="channel">
-      <div class="channel-top">
-        <div class="avatar">냥</div>
-        <div>
-          <h2>냥냥펀치</h2>
-          <span class="tag">동물·코믹</span>
-        </div>
+    <div class="toolbar">
+      <div class="filters">
+        <button class="filter-btn active" data-size="all">전체</button>
+        <button class="filter-btn" data-size="micro">1만 미만</button>
+        <button class="filter-btn" data-size="small">1만~10만</button>
+        <button class="filter-btn" data-size="mid">10만~100만</button>
+        <button class="filter-btn" data-size="big">100만 이상</button>
       </div>
-      <ul class="stats">
-        <li><strong>웃김</strong><span>분위기</span></li>
-        <li><strong>3분</strong><span>영상 길이</span></li>
-        <li><strong>매일</strong><span>업로드 주기</span></li>
-      </ul>
-      <p class="desc">고양이 두 마리의 엉뚱한 일상 짧은 영상</p>
-    </article>
+      <select id="sort" class="sort-select">
+        <option value="relevance">관련도순</option>
+        <option value="subscribers">구독자 많은 순</option>
+        <option value="videos">강의 영상 많은 순</option>
+        <option value="avgViews">평균 조회수 높은 순</option>
+      </select>
+    </div>
 
-    <article class="channel">
-      <div class="channel-top">
-        <div class="avatar">캠</div>
-        <div>
-          <h2>숲속캠핑로그</h2>
-          <span class="tag">캠핑·힐링</span>
-        </div>
-      </div>
-      <ul class="stats">
-        <li><strong>힐링</strong><span>분위기</span></li>
-        <li><strong>20분</strong><span>영상 길이</span></li>
-        <li><strong>주 1회</strong><span>업로드 주기</span></li>
-      </ul>
-      <p class="desc">말없이 장작 타는 소리만 들리는 솔로 캠핑 영상</p>
-    </article>
+    <p id="count" class="result-count"></p>
+    <p id="status" class="status">검색어를 입력하고 Enter를 눌러보세요.</p>
+  </section>
 
-    <article class="channel">
-      <div class="channel-top">
-        <div class="avatar">길</div>
-        <div>
-          <h2>길위의여행자</h2>
-          <span class="tag">여행·브이로그</span>
-        </div>
-      </div>
-      <ul class="stats">
-        <li><strong>설렘</strong><span>분위기</span></li>
-        <li><strong>15분</strong><span>영상 길이</span></li>
-        <li><strong>주 2회</strong><span>업로드 주기</span></li>
-      </ul>
-      <p class="desc">한 달 살기로 떠난 낯선 도시의 하루하루</p>
-    </article>
-
-  </main>
+  <main id="channel-list" class="channel-list"></main>
 
   <footer>
     <p>© 2026 유튜브 파인더</p>
   </footer>
+
+  <script src="config.js"></script>
+  <script src="youtube.js"></script>
 
 </body>
 </html>

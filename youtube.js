@@ -1,43 +1,65 @@
-// ===== 유튜브 채널 검색 =====
+// ===== 공부용 유튜버 검색 =====
 const form = document.querySelector('#search-form');
 const input = document.querySelector('#search');
 const list = document.querySelector('#channel-list');
 const statusText = document.querySelector('#status');
+const countText = document.querySelector('#count');
+const sizeButtons = document.querySelectorAll('.filter-btn');
+const sortSelect = document.querySelector('#sort');
 
 // 검색어 뒤에 붙일 단어 (공부 페이지라서 "강의")
 const SEARCH_SUFFIX = ' 강의';
+
+const SIZE_RANGES = {
+  all: [0, Infinity],
+  micro: [0, 10000],
+  small: [10000, 100000],
+  mid: [100000, 1000000],
+  big: [1000000, Infinity]
+};
+
+let allChannels = [];
+let currentSize = 'all';
+let hasSearched = false;
 
 form.addEventListener('submit', async function (event) {
   event.preventDefault();
   const keyword = input.value.trim();
   if (!keyword) return;
 
+  allChannels = [];
   list.innerHTML = '';
+  countText.textContent = '';
   showStatus('유튜브에서 찾는 중이에요...');
 
   try {
     const channels = await searchChannels(keyword + SEARCH_SUFFIX);
-    if (channels.length === 0) {
-      showStatus('찾는 채널이 없어요. 다른 검색어를 입력해 보세요.');
-      return;
-    }
-    hideStatus();
-    channels.forEach(function (channel) {
-      list.appendChild(createCard(channel));
-    });
+    allChannels = channels.map(toChannelData);
+    hasSearched = true;
+    render();
   } catch (error) {
     console.error(error);
     showStatus('검색 중 문제가 생겼어요: ' + error.message);
   }
 });
 
-// 1) 검색으로 채널 ID 찾기 → 2) 채널 상세 정보(구독자 등) 가져오기
+sizeButtons.forEach(function (button) {
+  button.addEventListener('click', function () {
+    sizeButtons.forEach(function (b) { b.classList.remove('active'); });
+    button.classList.add('active');
+    currentSize = button.dataset.size;
+    render();
+  });
+});
+
+sortSelect.addEventListener('change', render);
+
 async function searchChannels(query) {
   const searchParams = new URLSearchParams({
     part: 'snippet',
     type: 'channel',
     q: query,
-    maxResults: '12',
+    maxResults: '25',
     regionCode: 'KR',
     relevanceLanguage: 'ko',
     key: API_KEY
@@ -53,8 +75,6 @@ async function searchChannels(query) {
   });
   const channelData = await fetchJson('https://www.googleapis.com/youtube/v3/channels?' + channelParams);
   const channels = channelData.items || [];
-
-  // 검색 결과 순서대로 정렬
   channels.sort(function (a, b) { return ids.indexOf(a.id) - ids.indexOf(b.id); });
   return channels;
 }
@@ -68,14 +88,66 @@ async function fetchJson(url) {
   return data;
 }
 
-// 채널 정보로 카드 만들기
-function createCard(channel) {
+function toChannelData(channel, index) {
   const info = channel.snippet;
   const stats = channel.statistics;
+  const views = Number(stats.viewCount) || 0;
+  const videos = Number(stats.videoCount) || 0;
 
+  return {
+    id: channel.id,
+    order: index,
+    title: info.title,
+    handle: info.customUrl || '유튜브 채널',
+    thumbnail: info.thumbnails.default.url,
+    description: info.description || '채널 소개가 없어요.',
+    subscribers: stats.hiddenSubscriberCount ? null : Number(stats.subscriberCount),
+    videos: videos,
+    avgViews: videos > 0 ? Math.round(views / videos) : 0
+  };
+}
+
+function render() {
+  if (!hasSearched) return;
+  list.innerHTML = '';
+
+  if (allChannels.length === 0) {
+    countText.textContent = '';
+    showStatus('찾는 채널이 없어요. 다른 검색어를 입력해 보세요.');
+    return;
+  }
+
+  const range = SIZE_RANGES[currentSize];
+  const result = allChannels.filter(function (c) {
+    if (currentSize === 'all') return true;
+    return c.subscribers !== null && c.subscribers >= range[0] && c.subscribers < range[1];
+  });
+
+  const sortBy = sortSelect.value;
+  result.sort(function (a, b) {
+    if (sortBy === 'subscribers') return (b.subscribers || 0) - (a.subscribers || 0);
+    if (sortBy === 'videos') return b.videos - a.videos;
+    if (sortBy === 'avgViews') return b.avgViews - a.avgViews;
+    return a.order - b.order;
+  });
+
+  if (result.length === 0) {
+    countText.textContent = '';
+    showStatus('이 조건에 맞는 채널이 없어요. 다른 구독자 규모를 선택해 보세요.');
+    return;
+  }
+
+  hideStatus();
+  countText.textContent = '채널 ' + result.length + '개';
+  result.forEach(function (c) {
+    list.appendChild(createCard(c));
+  });
+}
+
+function createCard(c) {
   const card = document.createElement('a');
   card.className = 'channel';
-  card.href = 'https://www.youtube.com/channel/' + channel.id;
+  card.href = 'https://www.youtube.com/channel/' + c.id;
   card.target = '_blank';
   card.rel = 'noopener';
 
@@ -89,28 +161,33 @@ function createCard(channel) {
     </div>
     <ul class="stats">
       <li><strong class="subs"></strong><span>구독자</span></li>
-      <li><strong class="videos"></strong><span>영상 수</span></li>
-      <li><strong class="views"></strong><span>총 조회수</span></li>
+      <li><strong class="videos"></strong><span>강의 영상</span></li>
+      <li><strong class="avg"></strong><span>평균 조회수</span></li>
     </ul>
     <p class="desc"></p>
   `;
 
-  card.querySelector('.avatar-img').src = info.thumbnails.default.url;
-  card.querySelector('h2').textContent = info.title;
-  card.querySelector('.tag').textContent = info.customUrl || '유튜브 채널';
-  card.querySelector('.subs').textContent = stats.hiddenSubscriberCount ? '비공개' : formatNumber(stats.subscriberCount);
-  card.querySelector('.videos').textContent = formatNumber(stats.videoCount) + '개';
-  card.querySelector('.views').textContent = formatNumber(stats.viewCount);
-  card.querySelector('.desc').textContent = info.description || '채널 소개가 없어요.';
+  card.querySelector('.avatar-img').src = c.thumbnail;
+  card.querySelector('h2').textContent = c.title;
+  card.querySelector('.tag').textContent = c.handle;
+  card.querySelector('.subs').textContent = c.subscribers === null ? '비공개' : formatNumber(c.subscribers);
+  card.querySelector('.videos').textContent = formatNumber(c.videos) + '개';
+  card.querySelector('.avg').textContent = formatNumber(c.avgViews);
+  card.querySelector('.desc').textContent = c.description;
 
   return card;
 }
 
-// 숫자를 "12.3만", "1.2억" 형태로
 function formatNumber(value) {
   const n = Number(value);
-  if (n >= 100000000) return (n / 100000000).toFixed(1).replace(/\.0$/, '') + '억';
-  if (n >= 10000) return (n / 10000).toFixed(1).replace(/\.0$/, '') + '만';
+  if (n >= 100000000) {
+    return (n / 100000000).toFixed(1).replace(/\.0$/, '') + '억';
+  }
+  if (n >= 10000) {
+    const man = n / 10000;
+    if (man >= 100) return Math.round(man).toLocaleString() + '만';
+    return man.toFixed(1).replace(/\.0$/, '') + '만';
+  }
   return n.toLocaleString();
 }
 
