@@ -349,26 +349,30 @@ a.channel:hover {
 }
 .random-btn
 .topic
-/* ===== 심심 페이지: 랜덤 추천 ===== */
-.random-btn {
-  width: 100%;
-  margin-top: 12px;
-  padding: 14px;
-  border: none;
-  border-radius: 12px;
-  background: #222;
-  color: #fff;
-  font-size: 1rem;
-  font-family: inherit;
-  cursor: pointer;
-}
-
-.random-btn:hover {
-  background: #444;
-}
-
-.topic {
+/* ===== 심심 페이지 v2: 기분 줄 ===== */
+.mood-row {
   margin-top: 16px;
+}
+
+.row-label {
+  display: block;
+  font-size: 0.85rem;
+  color: #888;
+  margin-bottom: 8px;
+}
+
+.mood-row .filters {
+  margin-top: 0;
+}
+
+.random-chip {
+  background: #ff4d4d;
+  color: #fff;
+  border-color: #ff4d4d;
   font-weight: bold;
-  color: #222;
+}
+
+.random-chip:hover {
+  background: #e63e3e;
+  border-color: #e63e3e;
 }

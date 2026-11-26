@@ -20,16 +20,33 @@
       <button type="submit" class="search-btn">검색</button>
     </form>
 
-    <div class="filters">
-      <button class="filter-btn mood-btn" data-mood="laugh">😂 웃고 싶을 때</button>
-      <button class="filter-btn mood-btn" data-mood="healing">🌿 힐링하고 싶을 때</button>
-      <button class="filter-btn mood-btn" data-mood="focus">🔍 몰입하고 싶을 때</button>
-      <button class="filter-btn mood-btn" data-mood="learn">💡 뭔가 알고 싶을 때</button>
+    <div class="mood-row">
+      <span class="row-label">기분으로 고르기</span>
+      <div class="filters">
+        <button class="filter-btn mood-btn" data-mood="laugh">😂 웃고 싶을 때</button>
+        <button class="filter-btn mood-btn" data-mood="healing">🌿 힐링하고 싶을 때</button>
+        <button class="filter-btn mood-btn" data-mood="focus">🔍 몰입하고 싶을 때</button>
+        <button class="filter-btn mood-btn" data-mood="learn">💡 뭔가 알고 싶을 때</button>
+        <button id="random-btn" class="filter-btn random-chip">🎲 아무거나</button>
+      </div>
     </div>
 
-    <button id="random-btn" class="random-btn">🎲 아무거나 추천받기</button>
+    <div class="toolbar">
+      <div class="filters">
+        <button class="filter-btn size-btn active" data-size="all">전체</button>
+        <button class="filter-btn size-btn" data-size="micro">1만 미만</button>
+        <button class="filter-btn size-btn" data-size="small">1만~10만</button>
+        <button class="filter-btn size-btn" data-size="mid">10만~100만</button>
+        <button class="filter-btn size-btn" data-size="big">100만 이상</button>
+      </div>
+      <select id="sort" class="sort-select">
+        <option value="random">섞어서 보기</option>
+        <option value="subscribers">구독자 많은 순</option>
+        <option value="avgViews">평균 조회수 높은 순</option>
+      </select>
+    </div>
 
-    <p id="topic" class="topic"></p>
+    <p id="count" class="result-count"></p>
     <p id="status" class="status">기분 버튼이나 🎲 버튼을 눌러보세요.</p>
   </section>
 
@@ -40,3 +57,7 @@
   </footer>
 
   <script src="config.js"></script>
+  <script src="fun.js"></script>
+
+</body>
+</html>
