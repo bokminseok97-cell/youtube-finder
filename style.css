@@ -442,3 +442,24 @@ a.channel:hover {
   text-align: center;
   padding: 8px 20px 24px;
 }
+/* ===== 기분 버튼: 선택한 것만 빨간색 ===== */
+.random-chip {
+  background: #fff;
+  color: #555;
+  border-color: #ddd;
+}
+
+.random-chip:hover {
+  background: #fff;
+  border-color: #999;
+}
+
+.mood-btn.selected,
+.random-chip.selected,
+.mood-btn.selected:hover,
+.random-chip.selected:hover {
+  background: #ff4d4d;
+  color: #fff;
+  border-color: #ff4d4d;
+  font-weight: bold;
+}

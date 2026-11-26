@@ -10,7 +10,7 @@ const AVG_LABEL = SETTINGS.avgLabel || '평균 조회수';
 // ===== 공통 설정 (숫자만 바꿔서 조절할 수 있어요) =====
 const SHOW_COUNT = 20;          // 한 번에 보여줄 채널 수
 const MIN_SUBSCRIBERS = 10000;  // 최소 구독자 수
-const MAX_PAGES = 3;            // 검색어 하나당 유튜브에서 불러올 최대 횟수 (1번 = 50개)
+const MAX_PAGES = 2;            // 검색어 하나당 추가로 불러올 최대 횟수 (1번 = 채널 50 + 인기 영상 50)
 
 const SIZE_RANGES = {
   all: [MIN_SUBSCRIBERS, Infinity],
@@ -33,13 +33,14 @@ const sortSelect = document.querySelector('#sort');
 const rerollButtons = document.querySelectorAll('.reroll-btn');
 
 // ===== 상태 =====
-let pool = [];              // 받아온 후보 채널 (1만 이상만)
-let nextPageToken = null;
+let pool = [];                 // 받아온 후보 채널 (1만 이상만)
+let channelPageToken = null;   // 채널 검색 "다음 페이지"
+let videoPageToken = null;     // 인기 영상 검색 "다음 페이지"
 let pagesLoaded = 0;
 let currentTopic = '';
 let currentQuery = '';
 let currentSize = 'all';
-let offset = 0;             // 지금 몇 번째부터 보여주는지
+let offset = 0;
 let hasSearched = false;
 let isLoading = false;
 
@@ -47,27 +48,54 @@ let isLoading = false;
 form.addEventListener('submit', function (event) {
   event.preventDefault();
   const keyword = input.value.trim();
-  if (keyword) runSearch(keyword);
+  if (keyword) {
+    selectMood(null);   // 직접 검색하면 기분 선택 표시 해제
+    runSearch(keyword);
+  }
 });
 
 moodButtons.forEach(function (button) {
   button.addEventListener('click', function () {
+    if (isLoading) return;
+    selectMood(button);
     runSearch(pickRandom(MOODS[button.dataset.mood]));
   });
 });
 
 if (randomButton) {
   randomButton.addEventListener('click', function () {
+    if (isLoading) return;
+    selectMood(randomButton);
     runSearch(pickRandom(Object.values(MOODS).flat()));
   });
 }
 
+// 선택한 기분 버튼만 빨간색으로 표시
+function selectMood(selectedButton) {
+  moodButtons.forEach(function (b) { b.classList.remove('selected'); });
+  if (randomButton) randomButton.classList.remove('selected');
+  if (selectedButton) selectedButton.classList.add('selected');
+}
+
 sizeButtons.forEach(function (button) {
-  button.addEventListener('click', function () {
+  button.addEventListener('click', async function () {
     sizeButtons.forEach(function (b) { b.classList.remove('active'); });
     button.classList.add('active');
     currentSize = button.dataset.size;
     offset = 0;
+
+    // 이 규모의 채널이 부족하면 더 불러오기
+    if (hasSearched && !isLoading && sortedResult().length < SHOW_COUNT && canLoadMore()) {
+      isLoading = true;
+      showStatus('이 규모의 채널을 더 찾는 중이에요...');
+      try {
+        await fillTo(SHOW_COUNT);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        isLoading = false;
+      }
+    }
     render();
   });
 });
@@ -89,7 +117,8 @@ async function runSearch(keyword) {
   currentTopic = keyword;
   currentQuery = keyword + SUFFIX;
   pool = [];
-  nextPageToken = null;
+  channelPageToken = null;
+  videoPageToken = null;
   pagesLoaded = 0;
   offset = 0;
   hasSearched = false;
@@ -128,7 +157,6 @@ async function reroll() {
     isLoading = false;
   }
 
-  // 끝까지 다 봤으면 처음부터 다시 섞어서
   if (offset >= sortedResult().length) {
     offset = 0;
     reshuffle();
@@ -138,7 +166,6 @@ async function reroll() {
   resultBar.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// 조건에 맞는 채널이 needed개가 될 때까지 불러오기
 async function fillTo(needed) {
   while (sortedResult().length < needed && canLoadMore()) {
     await loadMore();
@@ -147,48 +174,80 @@ async function fillTo(needed) {
 
 function canLoadMore() {
   if (pagesLoaded === 0) return true;
-  return nextPageToken !== null && pagesLoaded < MAX_PAGES;
+  const hasNext = channelPageToken !== null || videoPageToken !== null;
+  return hasNext && pagesLoaded < MAX_PAGES;
 }
 
-// 유튜브에서 50개 더 받아오기
+// 채널 검색 + 인기 영상 검색을 동시에 해서 후보 모으기
 async function loadMore() {
+  const firstTime = pagesLoaded === 0;
+  const empty = Promise.resolve({ ids: [], token: null });
+
+  const results = await Promise.all([
+    firstTime || channelPageToken ? searchIds('channel', channelPageToken) : empty,
+    firstTime || videoPageToken ? searchIds('video', videoPageToken) : empty
+  ]);
+  const channelResult = results[0];
+  const videoResult = results[1];
+
+  pagesLoaded++;
+  channelPageToken = channelResult.token;
+  videoPageToken = videoResult.token;
+
+  // 두 결과를 번갈아 섞어서 중복 없이 모으기
+  const existingIds = new Set(pool.map(function (c) { return c.id; }));
+  const ids = [];
+  const maxLength = Math.max(channelResult.ids.length, videoResult.ids.length);
+  for (let i = 0; i < maxLength; i++) {
+    [channelResult.ids[i], videoResult.ids[i]].forEach(function (id) {
+      if (id && !existingIds.has(id) && !ids.includes(id)) ids.push(id);
+    });
+  }
+  if (ids.length === 0) return;
+
+  // 채널 상세 정보는 한 번에 50개까지만 요청 가능 → 나눠서 요청
+  const items = [];
+  for (let i = 0; i < ids.length; i += 50) {
+    const chunk = ids.slice(i, i + 50);
+    const channelParams = new URLSearchParams({
+      part: 'snippet,statistics',
+      id: chunk.join(','),
+      key: API_KEY
+    });
+    const channelData = await fetchJson('https://www.googleapis.com/youtube/v3/channels?' + channelParams);
+    (channelData.items || []).forEach(function (item) { items.push(item); });
+  }
+
+  const newChannels = items
+    .map(toChannelData)
+    .filter(function (c) { return c.subscribers !== null && c.subscribers >= MIN_SUBSCRIBERS; });
+
+  newChannels.sort(function (a, b) { return ids.indexOf(a.id) - ids.indexOf(b.id); });
+  const base = pool.length;
+  newChannels.forEach(function (c, i) { c.rank = base + i; });
+  shuffle(newChannels).forEach(function (c, i) { c.order = base + i; });
+  newChannels.forEach(function (c) { pool.push(c); });
+}
+
+// type: 'channel' = 채널 검색, 'video' = 조회수 높은 영상 검색
+async function searchIds(type, pageToken) {
   const params = {
     part: 'snippet',
-    type: 'channel',
+    type: type,
     q: currentQuery,
     maxResults: '50',
     regionCode: 'KR',
     relevanceLanguage: 'ko',
     key: API_KEY
   };
-  if (nextPageToken) params.pageToken = nextPageToken;
+  if (type === 'video') params.order = 'viewCount';
+  if (pageToken) params.pageToken = pageToken;
 
-  const searchData = await fetchJson('https://www.googleapis.com/youtube/v3/search?' + new URLSearchParams(params));
-  pagesLoaded++;
-  nextPageToken = searchData.nextPageToken || null;
-
-  const existingIds = new Set(pool.map(function (c) { return c.id; }));
-  const ids = searchData.items
-    .map(function (item) { return item.id.channelId; })
-    .filter(function (id) { return id && !existingIds.has(id); });
-  if (ids.length === 0) return;
-
-  const channelParams = new URLSearchParams({
-    part: 'snippet,statistics',
-    id: ids.join(','),
-    key: API_KEY
+  const data = await fetchJson('https://www.googleapis.com/youtube/v3/search?' + new URLSearchParams(params));
+  const ids = (data.items || []).map(function (item) {
+    return type === 'channel' ? item.id.channelId : item.snippet.channelId;
   });
-  const channelData = await fetchJson('https://www.googleapis.com/youtube/v3/channels?' + channelParams);
-
-  const newChannels = (channelData.items || [])
-    .map(toChannelData)
-    .filter(function (c) { return c.subscribers !== null && c.subscribers >= MIN_SUBSCRIBERS; });
-
-  newChannels.sort(function (a, b) { return ids.indexOf(a.id) - ids.indexOf(b.id); });
-  const base = pool.length;
-  newChannels.forEach(function (c, i) { c.rank = base + i; });            // 관련도 순서
-  shuffle(newChannels).forEach(function (c, i) { c.order = base + i; });  // 섞인 순서
-  newChannels.forEach(function (c) { pool.push(c); });
+  return { ids: ids, token: data.nextPageToken || null };
 }
 
 async function fetchJson(url) {
@@ -232,7 +291,6 @@ function matchesSize(c) {
   return c.subscribers >= range[0] && c.subscribers < range[1];
 }
 
-// 구독자 조건 + 정렬 적용한 목록
 function sortedResult() {
   const sortBy = sortSelect.value;
   return pool.filter(matchesSize).sort(function (a, b) {
