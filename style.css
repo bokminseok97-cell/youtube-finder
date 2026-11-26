@@ -307,3 +307,43 @@ a.channel:hover {
   overflow: hidden;
   line-clamp: 2;
 }
+/* ===== 협업 페이지: 필터 + 정렬 + 연락처 ===== */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.toolbar .filters {
+  margin-top: 0;
+}
+
+.sort-select {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 0.9rem;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.result-count {
+  margin-top: 16px;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.contact {
+  margin-top: 12px;
+  font-size: 0.85rem;
+  color: #333;
+  word-break: break-all;
+}
+
+.contact.none {
+  color: #aaa;
+}
